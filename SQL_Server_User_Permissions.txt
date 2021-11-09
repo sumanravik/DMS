@@ -1,0 +1,30 @@
+List of Privileges required in SQL Server: 
+
+
+Full load migration: 
+
+USE db_name;
+CREATE USER dms_user FOR LOGIN dms_user;
+ALTER ROLE [db_datareader] ADD MEMBER dms_user;
+GRANT VIEW DATABASE STATE to dms_user ;
+USE master;
+GRANT VIEW SERVER STATE TO dms_user;
+
+
+
+CDC Migration: 
+Pre-Requisites: 
+In the User Mappings section of SSMS, choose the MSDB and MASTER databases and assign the DB_OWNER role for the database you want to use ongoing replication. 
+Open the context menu for the new account, choose Security and grant the Connect SQL privilege.
+
+
+Run the following grant commands.
+
+GRANT SELECT ON FN_DBLOG TO dms_user;
+GRANT VIEW SERVER STATE TO dms_user;
+use msdb;
+GRANT EXECUTE ON MSDB.DBO.SP_STOP_JOB TO dms_user;
+GRANT EXECUTE ON MSDB.DBO.SP_START_JOB TO dms_user;
+GRANT SELECT ON MSDB.DBO.BACKUPSET TO dms_user;
+GRANT SELECT ON MSDB.DBO.BACKUPMEDIAFAMILY TO dms_user;
+GRANT SELECT ON MSDB.DBO.BACKUPFILE TO dms_user;
