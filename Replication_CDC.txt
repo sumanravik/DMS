@@ -1,0 +1,46 @@
+Replication:
+In SSMS, open the context (right-click) menu for the Replication folder, and then choose Configure Distribution. Follow all default steps and configure this SQL Server instance for distribution. A distribution database is created under databases.
+Create a publication for SQL Server ongoing replication as follows:
+Log in to SSMS using the SYSADMIN user account.
+Expand Replication.
+Open the context (right-click) menu for Local Publications.
+In the New Publication Wizard, choose Next.
+Choose the database where you want to create the publication.
+Choose Transactional publication, and then choose Next.
+Expand Tables and choose the tables with PK and the tables that you want to publish. Choose Next.
+Choose Next, because you don't need to create a filter.
+In the Snapshot Agent screen, choose the first option to Create a snapshot immediately and keep the snapshot available to initialize subscriptions. Choose Next.
+Choose Security Settings, and then choose Run under the SQL Server Agent service account. Make sure to choose By impersonating the process account for a publisher connection. Choose OK.
+Choose Next.
+Choose Create the publication.
+Provide a name of the publication in the format AR_PUBLICATION_000DBID.
+For example, if your DBID is less than 10, name the publication AR_PUBLICATION_0000DBID> (4 zeros). If your DBID is greater than or equal to 10, name the publication AR_PUBLICATION_000DBID (3 zeros). You can also use the DB_ID function in SQL Server. For more information on the DB_ID function, see the SQL Server documentation.
+Create a new AWS DMS task with SQL Server as the source endpoint using the user account that you created.
+
+
+
+
+CDC:
+For tables without primary keys, set up MS-CDC for the database. To do so, use an account that has the sysadmin role assigned to it, and run the following command.
+
+use [DBname]
+EXEC sys.sp_cdc_enable_db                
+                
+Next, set up MS-CDC for each of the source tables. For each table with unique keys but no primary key, run the following query to set up MS-CDC.
+
+exec sys.sp_cdc_enable_table
+@source_schema = N'schema_name',
+@source_name = N'table_name',
+@index_name = N'unique_index_name',
+@role_name = NULL,
+@supports_net_changes = 1
+GO                  
+                
+For each table with no primary key or no unique keys, run the following query to set up MS-CDC.
+
+exec sys.sp_cdc_enable_table
+@source_schema = N'schema_name',
+@source_name = N'table_name',
+@role_name = NULL
+GO                 
+        
